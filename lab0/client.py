@@ -158,7 +158,7 @@ class Client:
 
         See also: register(self)
         """
-        req  = api.LoginRequest(self._username, self._auth_secret)
+        req = api.LoginRequest(self._username, self._auth_secret)
         resp = self._remote.login(req)
         if resp.error is None:
             self._server_session_token = resp.token
@@ -176,7 +176,11 @@ class Client:
         >>> public_prof = {'bio': 'I like computer security and cryptography', 'location': 'MIT', 'camera': 'mobile phone'}
         >>> alice.update_public_profile_infos(public_prof)
         """
-        pass
+        profile = api.PublicProfile(self._username, infos)
+        req = api.UpdatePublicProfileRequest(self._username, self._server_session_token, profile)
+        resp = self._remote.update_public_profile(req)
+        if resp.error is not None:
+            raise Exception(resp)
     
     def get_friend_public_profile(self, friend_username):
         """ Obtain the public profile of another user
@@ -191,7 +195,11 @@ class Client:
         >>> bob.get_friend_public_profile("alice").infos
         {'bio': 'I like computer security and cryptography', 'location': 'MIT', 'camera': 'mobile phone'}
         """
-        pass
+        req  = api.GetFriendPublicProfileRequest(self._username, self._server_session_token, friend_username)
+        resp = self._remote.get_friend_public_profile(req)
+        if resp.error is not None:
+            raise Exception(resp)
+        return resp.public_profile
 
     def list_photos(self):
         """Fetch a list containing the photo id of each photo stored
